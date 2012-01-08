@@ -1,0 +1,8 @@
+This is the home of the code I have written, and will write, while working through the seminal "Structure and Interpretation of Computer Programs" (SICP).  SICP was the introductory computer science text book at MIT, which uses Lisp, or a Lisp like language, to teach programming.  The book is available for free in a number of formats at the following URLs.
+
+HTML: http://mitpress.mit.edu/sicp/sicp.html
+PDF: http://news.ycombinator.com/item?id=441593
+
+I plan on writing and running all of my code in Racket, which appears to have superseded Scheme as the educational Lips variant du jour.  To get DrRacket, go to the link below.
+
+http://racket-lang.org/
