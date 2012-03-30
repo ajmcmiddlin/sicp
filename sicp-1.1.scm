@@ -1,4 +1,4 @@
-#lang racket
+#lang R5RS
 ;-----------------------------------------------------------------
 ; Exercise 1.2
 (define (exercise-1-2)
@@ -49,7 +49,7 @@
 ;
 ; Applicative order
 ; -> (test x (p))
-; -> Interpreter: x is x
+; -> Interpreter: x is 0
 ; -> Interpreter: (p) is (p), so let's evaluate (p)
 ; -> Interpreter: (p) is (p), so let's evaluate (p)
 ; -> ...
@@ -66,8 +66,72 @@
 
 
 ;-----------------------------------------------------------------
-; Square Root Code
-(define (is-guess-close-enough guess old-guess max-pc-change)
+; Exercise 1.6
+; sqrt-1-6 is a procedure that fails to terminate.  The reason is that new-if is not a special form, and
+; therefore applicative order evaluation is used to evaluate all of its arguments before new-if itself is
+; evaluated.  That means that the recursive call to sqrt-iter-1-6 is evaluated before the call to new-if,
+; and that recursive call contains another recursive call which needs to evaluated.  The evaluation of
+; recursive calls to sqrt-pc-change-1-6 will continue ad infinitum.
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x)) 0.001))
+
+(define (average a b)
+  (/ (+ a b) 2))
+
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x) x)))
+
+(define (sqrt x)
+  (sqrt-iter 1.0 x))
+
+(define (new-if predicate then-clause else-clause)
+  (cond (predicate then-clause)
+        (else else-clause)))
+
+(define (sqrt-iter-1-6 guess x)
+  (new-if (good-enough? guess x)
+      guess
+      (sqrt-iter-1-6 (improve guess x) x)))
+
+(define (sqrt-1-6 x)
+  (sqrt-iter-1-6 1.0 x))
+
+; Below is an additional test I ran while playing with this exercise to confirm my understanding.  It
+; demonstrates that cond is a special form that is evaluated the same way that if is: subsequent predicates
+; are only evaluated if their predecessors return false.  That is, the recursive calls are only evaluated
+; until the guess is close enough, at which point the guess is returned without trying to evaluate the next
+; recursive call.
+(define (sqrt-iter-cond guess x)
+  (cond ((good-enough? guess x) guess)
+        (else (sqrt-iter-cond (improve guess x) x))))
+
+(define (sqrt-cond x)
+  (sqrt-iter-cond 1.0 x))
+
+
+;-----------------------------------------------------------------
+; Exercise 1.7
+; As the exercise states, the above procedures are not good for small numbers.  This is because any guess
+; that, when squared, is within 0.001, will be considered good enough and returned as the answer.  For small
+; decimals, a guess may come within 0.001 of the answer yet still not be close to the answer relative to the
+; size of the input.  The example below demonstrates this point, as it shows a guess that is approximately
+; 312 times too large being returned as good enough, because it is indeed within 0.001 of the answer.
+;
+; > (square (sqrt 0.00000001))
+; 0.000976569160163076
+; > (square (sqrt-pc-change 0.00000001))
+; 1.000008122264028e-008
+; > (sqrt 0.00000001)
+; 0.03125010656242753
+; > (sqrt-pc-change 0.00000001)
+; 0.00010000040611237676
+
+(define (good-enough-pc-change? guess old-guess max-pc-change)
   (< (* (abs (- 1.0 (/ old-guess guess))) 100.0) max-pc-change))
 
 ; Calculates the next square root guess given the previous guess and the radicand (number we're trying to find
@@ -77,42 +141,10 @@
 
 ; Calculates an approximation of the square root of n; returning when the percentage change between guesses is
 ; less than max-pc-change.
-(define (sqrt-pc-change n guess old-guess max-pc-change)
-  (if (is-guess-close-enough guess old-guess max-pc-change)
+(define (sqrt-pc-change-iter n guess old-guess max-pc-change)
+  (if (good-enough-pc-change? guess old-guess max-pc-change)
       guess
-      (sqrt-pc-change n (improve-sqrt-guess guess n) guess max-pc-change)))
+      (sqrt-pc-change-iter n (improve-sqrt-guess guess n) guess max-pc-change)))
 
-(define (sqrt n)
-  (sqrt-pc-change n (improve-sqrt-guess 1.0 n) 1.0 1.0))
-
-
-;-----------------------------------------------------------------
-; Exercise 1.6
-; sqrt-1-6 is a procedure that fails to terminate.  The reason is that new-if is not a special form, and
-; therefore applicative order evaluation is used to evaluate all of its arguments before new-if itself is
-; evaluated.  That means that the recursive call to sqrt-pc-change-1-6 is evaluated before the call to new-if,
-; and that recursive call contains another recursive call which needs to evaluated.  The evaluation of
-; recursive calls to sqrt-pc-change-1-6 will continue ad infinitum.
-(define (new-if predicate then-clause else-clause)
-  (cond (predicate then-clause)
-        (else else-clause)))
-
-(define (sqrt-pc-change-1-6 n guess old-guess max-pc-change)
-  (new-if (is-guess-close-enough guess old-guess max-pc-change)
-      guess
-      (sqrt-pc-change-1-6 n (improve-sqrt-guess guess n) guess max-pc-change)))
-
-(define (sqrt-1-6 n)
-  (sqrt-pc-change-1-6 n (improve-sqrt-guess 1.0 n) 1.0 1.0))
-
-; Below is an additional test I ran while playing with this exercise to confirm my understanding.  It
-; demonstrates that cond is a special form that is evaluated the same way that if is: subsequent predicates
-; are only evaluated if their predecessors return false.  That is, the recursive calls are only evaluated
-; until the guess is close enough, at which point the guess is returned without trying to evaluate the next
-; recursive call.
-(define (sqrt-pc-change-1-6-safe n guess old-guess max-pc-change)
-  (cond ((is-guess-close-enough guess old-guess max-pc-change) guess)
-        (else (sqrt-pc-change-1-6-safe n (improve-sqrt-guess guess n) guess max-pc-change))))
-
-(define (sqrt-1-6-safe n)
-  (sqrt-pc-change-1-6-safe n (improve-sqrt-guess 1.0 n) 1.0 1.0))
+(define (sqrt-pc-change n)
+  (sqrt-pc-change-iter n (improve-sqrt-guess 1.0 n) 1.0 1.0))
