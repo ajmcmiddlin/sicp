@@ -148,3 +148,18 @@
 
 (define (sqrt-pc-change n)
   (sqrt-pc-change-iter n (improve-sqrt-guess 1.0 n) 1.0 1.0))
+
+
+;-----------------------------------------------------------------
+; Exercise 1.8
+(define (improve-cube-root-guess old-guess radicand)
+  (/ (+ (/ radicand (square old-guess)) (* 2 old-guess)) 3))
+
+(define (cube-root-iter n guess old-guess max-pc-change)
+  (if (good-enough-pc-change? guess old-guess max-pc-change)
+      guess
+      (cube-root-iter n (improve-cube-root-guess guess n) guess max-pc-change)))
+
+(define (cube-root n)
+  (cube-root-iter n (improve-cube-root-guess 1.0 n) 1.0 1.))
+
