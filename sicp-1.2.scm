@@ -106,3 +106,68 @@
 ;
 ; returns 2^2^2... n times - e.g. (h 5) -> 2^2^2^2^2
 ; (define (h n) (Ackermann 2 n))
+
+
+; Section 1.2.2 - counting change
+; -------------------------------
+; 
+; Copy the tree-recursive algorithm in the book to see how long it takes.
+(define (count-change amount)
+
+  (define (first-denomination kinds-of-coins)
+    (cond ((= kinds-of-coins 1) 1)
+          ((= kinds-of-coins 2) 5)
+          ((= kinds-of-coins 3) 10)
+          ((= kinds-of-coins 4) 25)
+          ((= kinds-of-coins 5) 50)))
+
+  (define (cc amount kinds-of-coins)
+    (cond ((= amount 0) 1)
+          ((< amount 0) 0)
+          ((= kinds-of-coins 0) 0)
+          (else (+ (cc amount (- kinds-of-coins 1))
+                   (cc (- amount (first-denomination kinds-of-coins)) kinds-of-coins)))))
+
+  (cc amount 5))
+
+
+; Exercise 1.11
+; -------------
+(define (f-recursive n)
+  (if (< n 3)
+      n
+      (+ (f-recursive (- n 1))
+         (* 2 (f-recursive (- n 2)))
+         (* 3 (f-recursive (- n 3))))))
+
+(define (f-iter n)
+
+  ; Internal iteration function
+  ;   n: the value we are calculating the function for
+  ;   current-n: the value of n that this iteration should evalute f(n) for
+  ;   fn-1: the value of f(current-n - 1)
+  ;   fn-2: the value of f(current-n - 2)
+  ;   fn-3: the value of f(current-n - 3)
+  (define (f-internal-iter n current-n fn-1 fn-2 fn-3)
+    (if (> current-n n)
+        fn-1
+        (f-internal-iter n
+                         (+ current-n 1)
+                         (+ fn-1 (* 2 fn-2) (* 3 fn-3))
+                         fn-1
+                         fn-2)))
+
+  (if (< n 3)
+      n
+      (f-internal-iter n 3 2 1 0)))
+
+
+; Exercise 1.12
+; -------------
+; pascal returns the number in Pascal's triangle given its row and column (both starting at 1)
+(define (pascal row col)
+  (cond ((< row 3) 1)
+        ((= col 1) 1)
+        ((= row col) 1)
+        (else (+ (pascal (- row 1) (- col 1))
+                 (pascal (- row 1) col)))))
