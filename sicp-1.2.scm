@@ -171,3 +171,36 @@
         ((= row col) 1)
         (else (+ (pascal (- row 1) (- col 1))
                  (pascal (- row 1) col)))))
+
+; Exercise 1.13
+; -------------
+; See the interwebs :p
+
+
+; Exercise 1.14 TODO
+; ------------------
+; Drew tree, but problem hard.  Deepest path through the tree is if you make the entire sum up from pennies.
+; While there are other trees in memory at the same time, they seem to end earlier, so it looks like O(n) in
+; space.  Number of steps - no idea.  Need to make progres...
+
+
+; Exercise 1.15
+; -------------
+(define (cube x) (* x x x))
+(define (p x) (- (* 3 x) (* 4 (cube x))))
+(define (sine angle)
+  (if (not (> (abs angle) 0.1))
+      angle
+      (p (sine (/ angle 3.0)))))
+
+; Part a)
+; Each time we make a recursive call to sine, we divide the problem angle by 3.  When we hit an angle that is
+; <= to our limit (0.1 in this case), we stop and unwind the recursive calls.  Each recursive call results in
+; a call to p for the returned angle, so p is applied however many times we need to divide 12.15 by 3 to get
+; a number that is less than 0.1.  12.15 / (3^4) = 0.15 and 12.15 / (3^5) = 0.05, therefore the answer is 5.
+;
+; Part b)
+; As the problem space is being divided by 3 with each recursive call, the problem will grow in log3(a) space
+
+
+
