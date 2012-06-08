@@ -200,7 +200,9 @@
 ; a number that is less than 0.1.  12.15 / (3^4) = 0.15 and 12.15 / (3^5) = 0.05, therefore the answer is 5.
 ;
 ; Part b)
-; As the problem space is being divided by 3 with each recursive call, the problem will grow in log3(a) space
+; As the problem space is being divided by 3 with each recursive call, the problem will grow in log3(a)
+; space.  As the majority of the computing time will be spent processing calls to p, and p is called after
+; each recursive call, the function will grow in number of steps at the same rate as it will grow in space.
 
 
 
