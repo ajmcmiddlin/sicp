@@ -206,3 +206,17 @@
 
 
 
+; Exercise 1.16
+; -------------
+
+(define (fast-expt-116 b n)
+  (define (even? n)
+    (= (remainder n 2) 0))
+
+  (define (fast-expt-iter b n a)
+    (cond ((= n 0) a)
+          ((= n 1) (* a b))
+          ((even? n) (fast-expt-iter (* b b) (- (/ n 2) 1) (* a b b)))
+          (else (fast-expt-iter b (- n 1) (* a b)))))
+
+  (fast-expt-iter b n 1))
