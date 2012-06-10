@@ -223,10 +223,20 @@
 
 ; Exercise 1.17
 ; -------------
-(define (mult a b)
-  (define (double n) (* n 2))
-  (define (halve n) (/ n 2))
+(define (double n) (* n 2))
+(define (halve n) (/ n 2))
+(define (mult-117 a b)
+    (cond ((= b 0) 0)
+          ((= a 0) 0)
+          ((= b 1) a)
+          ((= a 1) b)   ; optimization in case called with a=1
+          ((even? b) (mult-117 (double a) (halve b)))
+          (else (+ a (mult-117 a (- b 1))))))
 
+
+; Exercise 1.18
+; -------------
+(define (mult-118 a b)
   ; (+ (* a b) result) is the invariant.  If b is odd, we start by making result a and subtracting one from
   ; b, after which b is even and we can commence with the doubling and halving in logarithmic time.
   (define (mult-iter a b result)
