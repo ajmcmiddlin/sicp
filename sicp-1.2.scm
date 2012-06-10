@@ -208,7 +208,6 @@
 
 ; Exercise 1.16
 ; -------------
-
 (define (fast-expt-116 b n)
   (define (even? n)
     (= (remainder n 2) 0))
@@ -220,3 +219,22 @@
           (else (fast-expt-iter b (- n 1) (* a b)))))
 
   (fast-expt-iter b n 1))
+
+
+; Exercise 1.17
+; -------------
+(define (mult a b)
+  (define (double n) (* n 2))
+  (define (halve n) (/ n 2))
+
+  ; (+ (* a b) result) is the invariant.  If b is odd, we start by making result a and subtracting one from
+  ; b, after which b is even and we can commence with the doubling and halving in logarithmic time.
+  (define (mult-iter a b result)
+    (cond ((= b 0) 0)
+          ((= a 0) 0)
+          ((= b 1) (+ result a))
+          ((= a 1) (+ result b))
+          ((even? b) (mult-iter (double a) (halve b) result))
+          (else (mult-iter a (- b 1) (+ result a)))))
+
+  (mult-iter a b 0))
